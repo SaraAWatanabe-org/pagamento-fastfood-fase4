@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: fastfood-payment
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/payment-db
+    
+lunch:
+  service:
+    url: http://localhost:8081/lunches
+    
+dataprovider:
+  payment:
+    mercado-pago:
+      access-token: ${MERCADO_PAGO_ACCESS_TOKEN}
+      default-payer-email: ${MERCADO_PAGO_DEFAULT_PAYER_EMAIL}
+
+api:
+  url: ${TECHFOOD_API_URL}

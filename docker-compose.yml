@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: payment-db
+      
+  app:
+    image: fastfood-payment
+    container_name: fastfood-payment
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/payment-db
+      MERCADO_PAGO_ACCESS_TOKEN: token
+      MERCADO_PAGO_DEFAULT_PAYER_EMAIL: default_email@mail.com
+      TECHFOOD_API_URL: localhost:8080
