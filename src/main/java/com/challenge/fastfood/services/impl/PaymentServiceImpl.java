@@ -102,49 +102,6 @@ public class PaymentServiceImpl implements PaymentService {
 		return lunchModel;
 	}
 
-
-	/*
-	 *         Lunch lunchById = findLunchGatewayInterface.findLunchById(payment.getNumberLunch());
-
-        if(lunchById == null){
-            throw new PaymentException("Pedido invalido para pagamento: Número de lanche não existe no banco");
-        }
-
-        if(paymentByLunchId != null){
-            if(Objects.equals(payment.getNumberLunch(), paymentByLunchId.getNumberLunch())){
-
-                if("SUCCESS".equals(paymentByLunchId.getStatus())){
-                    throw new PaymentException("Pagamento já foi processado com sucesso");
-                }
-//                else{
-//                    throw new PaymentException("Processando pagamento");
-//                }
-            }
-
-            if(!Objects.equals(payment.getCpf(), lunchById.getClient().getCpf())){
-                throw new PaymentException("CPF precisa existir no banco da lanchonete");
-            }
-
-        }else{
-            payment.setStatus("PENDING");
-        }
-	 */
-
-	/*
-
-
-	public PaymentModel findByNumberLunch(Long paymentId) {
-		return paymentRepository.findById(paymentId).orElseThrow(() -> new ObjectNotFoundException("Pagamento não encontrado."));
-	}
-
-	@Override
-	public Payment findPaymentByTransactionId(String transactionId) {
-		PaymentEntity payment = paymentRepository.findPaymentByTransactionId(transactionId);
-		return paymentMapper.toPayment(payment);
-	}
-
-	 */
-
 	public void updateLunchStatus(Long lunchId, int newStatus) {
 		String url = String.format("%s/%s/status", lunchServiceUrl, lunchId);
 
