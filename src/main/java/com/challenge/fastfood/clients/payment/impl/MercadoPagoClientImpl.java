@@ -2,6 +2,7 @@ package com.challenge.fastfood.clients.payment.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -86,11 +87,12 @@ public class MercadoPagoClientImpl implements PaymentExternalClient {
 
 		log.info("notificationUrl: {}", notificationUrl);
 
+		UUID paymentId = UUID.randomUUID();
 
 		PaymentCreateRequest createRequest =
 				PaymentCreateRequest.builder()
 				.transactionAmount(lunchModel.getValue())
-				.externalReference(lunchModel.getId().toString())
+				.externalReference(paymentId.toString())
 				.description("fiap-techfood")
 				.installments(1)
 				.paymentMethodId("pix")
@@ -102,6 +104,7 @@ public class MercadoPagoClientImpl implements PaymentExternalClient {
 			Payment paymentResponse = paymentClient.create(createRequest);
 			if(PaymentStatus.PENDING.equals(paymentResponse.getStatus())) {
 				PaymentModel paymentModel = this.paymentMapper.toPaymentModel(paymentResponse);
+				paymentModel.setId(paymentId);
 				paymentModel.setNumberLunch(lunchModel.getId());
 				paymentModel.setValue(lunchModel.getValue());
 				paymentModel.setStatus(PaymentStatusEnum.PENDING);

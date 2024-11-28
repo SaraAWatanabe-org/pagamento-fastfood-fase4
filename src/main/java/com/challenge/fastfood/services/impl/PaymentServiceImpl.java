@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
 			lunchModel = lunchRepository.save(lunchModel);
 		}
 
-		if(!(lunchModel.getStatus().equals(LunchStatusEnum.READY) 
+		if(!(lunchModel.getStatus().equals(LunchStatusEnum.RECEIVED) 
 				|| lunchModel.getStatus().equals(LunchStatusEnum.PAYMENT_CREATE_FAILED)
 				|| lunchModel.getStatus().equals(LunchStatusEnum.PAYMENT_REJECTED))) {
 			throw new DataIntegrityException("It is not possible to create a Payment for the order.");
@@ -115,6 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
+	@Transactional
 	public PaymentModel checkPaymentStatus(String transactionId, PaymentProviderEnum paymentType) {
 		PaymentModel paymentModel = paymentRepository.findPaymentByTransactionId(transactionId)
 				.orElseThrow(() -> new ObjectNotFoundException("Pagamento não encontrado. TransactionId: " + transactionId));
@@ -124,10 +125,25 @@ public class PaymentServiceImpl implements PaymentService {
 		PaymentStatusEnum paymentStatus = client.checkPaymentStatus(transactionId);
 		paymentModel.setStatus(paymentStatus);
 
-		updateLunchStatus(paymentModel.getNumberLunch(), PaymentStatusEnum.APPROVED.equals(paymentStatus) ? "SUCCESS": "FAIL");
+
+		LunchModel lunchModel = lunchRepository.findById(paymentModel.getNumberLunch())
+				.orElseThrow(() -> new ObjectNotFoundException("Pedido não encontrado. TransactionId: " + paymentModel.getNumberLunch()));
+
+
+		if(PaymentStatusEnum.APPROVED.equals(paymentStatus)) {
+			lunchModel.setStatus(LunchStatusEnum.PAYMENT_APPROVED);
+			updateLunchStatus(paymentModel.getNumberLunch(), "SUCCESS");
+		} else {
+			lunchModel.setStatus(LunchStatusEnum.PAYMENT_REJECTED);
+			updateLunchStatus(paymentModel.getNumberLunch(), "FAIL");
+		}
+		lunchRepository.save(lunchModel);
+
 
 		return paymentRepository.save(paymentModel);
 	}
+
+
 
 
 }

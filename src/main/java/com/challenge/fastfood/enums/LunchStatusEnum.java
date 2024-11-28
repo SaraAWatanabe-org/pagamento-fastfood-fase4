@@ -30,7 +30,7 @@ public enum LunchStatusEnum {
 
 	public static LunchStatusEnum toEnum(String code) {
 		for (LunchStatusEnum status : values()) {
-			if (status.getDescription().equalsIgnoreCase(code)) {
+			if (status.getCode().equalsIgnoreCase(code)) {
 				return status;
 			}
 		}
