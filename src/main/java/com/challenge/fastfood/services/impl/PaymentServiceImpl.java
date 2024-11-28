@@ -1,5 +1,6 @@
 package com.challenge.fastfood.services.impl;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +53,6 @@ public class PaymentServiceImpl implements PaymentService {
 		this.lunchServiceUrl = lunchServiceUrl;
 	}
 
-
 	@Transactional
 	public PaymentModel processPayment(PaymentCreateDto paymentCreateDto) {
 
@@ -67,22 +67,21 @@ public class PaymentServiceImpl implements PaymentService {
 			lunchModel = lunchRepository.save(lunchModel);
 		}
 
-
 		if(!(lunchModel.getStatus().equals(LunchStatusEnum.READY) 
 				|| lunchModel.getStatus().equals(LunchStatusEnum.PAYMENT_CREATE_FAILED)
 				|| lunchModel.getStatus().equals(LunchStatusEnum.PAYMENT_REJECTED))) {
 			throw new DataIntegrityException("It is not possible to create a Payment for the order.");
 		}
 
-		PaymentExternalClient paymentClient = paymentFactory.getPaymentClient(paymentCreateDto.getPaymentType());
+		PaymentExternalClient paymentClient = paymentFactory.getPaymentClient(PaymentProviderEnum.MERCADO_PAGO);
 
 		if(paymentClient == null) {
-			throw new DataIntegrityException("Não foi selecionado um meio de pagamento válido. Code: " + paymentCreateDto.getPaymentType());
+			throw new DataIntegrityException("Não foi selecionado um meio de pagamento válido.");
 		}
 
 		PaymentModel paymentModel = paymentClient.createPayment(lunchModel);
-		paymentModel.setPaymentType(paymentCreateDto.getPaymentType());
-		paymentModel.setValue(paymentCreateDto.getValue());
+		paymentModel.setPaymentType(PaymentProviderEnum.MERCADO_PAGO);
+		paymentModel.setValue(BigDecimal.valueOf(paymentCreateDto.getPriceTotal()));
 		paymentModel.setNumberLunch(paymentCreateDto.getNumberLunch());
 		paymentRepository.save(paymentModel);
 
@@ -95,24 +94,24 @@ public class PaymentServiceImpl implements PaymentService {
 	private LunchModel toLunchModel(PaymentCreateDto paymentCreateDto) {
 		LunchModel lunchModel = new LunchModel();
 		lunchModel.setId(paymentCreateDto.getNumberLunch());
-		lunchModel.setName(paymentCreateDto.getName());
-		lunchModel.setClientEmail(paymentCreateDto.getClientEmail());
-		lunchModel.setValue(paymentCreateDto.getValue());
+		lunchModel.setCpf(paymentCreateDto.getCpf());
+		lunchModel.setClientEmail(paymentCreateDto.getEmailClient());
+		lunchModel.setValue(BigDecimal.valueOf(paymentCreateDto.getPriceTotal()));
 		lunchModel.setStatus(LunchStatusEnum.RECEIVED);
 		return lunchModel;
 	}
 
-	public void updateLunchStatus(Long lunchId, int newStatus) {
-		String url = String.format("%s/%s/status", lunchServiceUrl, lunchId);
+	public void updateLunchStatus(Long lunchId, String newStatus) {
+		String url = this.lunchServiceUrl + "/payment/webhook";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Type", "application/json");
 
-		UpdateLunchStatusRequest request = new UpdateLunchStatusRequest(newStatus);
+		UpdateLunchStatusRequest request = new UpdateLunchStatusRequest(lunchId, newStatus);
 
 		HttpEntity<UpdateLunchStatusRequest> entity = new HttpEntity<>(request, headers);
 
-		restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class, lunchId);
+		restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
 	}
 
 	@Override
@@ -120,14 +119,12 @@ public class PaymentServiceImpl implements PaymentService {
 		PaymentModel paymentModel = paymentRepository.findPaymentByTransactionId(transactionId)
 				.orElseThrow(() -> new ObjectNotFoundException("Pagamento não encontrado. TransactionId: " + transactionId));
 
-
 		PaymentExternalClient client = paymentFactory.getPaymentClient(paymentType);
 
 		PaymentStatusEnum paymentStatus = client.checkPaymentStatus(transactionId);
 		paymentModel.setStatus(paymentStatus);
 
-		//TODO CHAMAR ENDPOINT MICROSERVIÇOS LUNCH
-		//updateLunchStatus();
+		updateLunchStatus(paymentModel.getNumberLunch(), PaymentStatusEnum.APPROVED.equals(paymentStatus) ? "SUCCESS": "FAIL");
 
 		return paymentRepository.save(paymentModel);
 	}

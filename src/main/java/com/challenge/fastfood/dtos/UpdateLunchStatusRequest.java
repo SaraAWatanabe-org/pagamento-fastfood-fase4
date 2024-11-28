@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateLunchStatusRequest {
 
-	private int lunchStatus;
-	
+	private Long numberLunch;
+	private String status;
+
 }

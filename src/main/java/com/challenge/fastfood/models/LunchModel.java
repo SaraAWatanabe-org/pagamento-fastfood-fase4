@@ -22,7 +22,7 @@ public class LunchModel {
 	@Id
 	private Long id;
 
-	private String name;
+	private String cpf;
 
 	private String status;
 	
