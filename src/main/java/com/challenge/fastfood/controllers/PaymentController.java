@@ -14,6 +14,7 @@ import com.challenge.fastfood.services.PaymentService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,7 +27,7 @@ public class PaymentController {
 	
     @PostMapping
     @Operation(summary = "Create Payment", description = "Create a payment for the lunch")
-    public ResponseEntity<PaymentModel> create(@RequestBody PaymentCreateDto paymentRequest) {
+    public ResponseEntity<PaymentModel> create(@RequestBody @Valid PaymentCreateDto paymentRequest) {
     	PaymentModel paymentModel = paymentService.processPayment(paymentRequest);
         return ResponseEntity.ok().body(paymentModel);
     }

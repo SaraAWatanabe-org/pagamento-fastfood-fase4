@@ -17,6 +17,7 @@ public interface PaymentMapper {
     @Mapping(target = "numberLunch", ignore = true)
     @Mapping(target = "paymentType", ignore = true)
     @Mapping(target = "value", ignore = true)
+    @Mapping(target = "status", ignore = true)
     PaymentModel toPaymentModel(Payment payment);
 
 }
