@@ -14,6 +14,9 @@ public interface PaymentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "pointOfInteraction.transactionData.qrCode", target = "qrCode")
     @Mapping(source = "pointOfInteraction.transactionData.ticketUrl", target = "ticketUrl")
+    @Mapping(target = "numberLunch", ignore = true)
+    @Mapping(target = "paymentType", ignore = true)
+    @Mapping(target = "value", ignore = true)
     PaymentModel toPaymentModel(Payment payment);
 
 }

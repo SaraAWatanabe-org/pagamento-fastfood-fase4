@@ -12,23 +12,27 @@ import com.challenge.fastfood.enums.PaymentProviderEnum;
 import com.challenge.fastfood.models.PaymentModel;
 import com.challenge.fastfood.services.PaymentService;
 
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/payments")
-@AllArgsConstructor
+@RequestMapping("/payment")
+@Tag(name = "payment", description = "Payment Controller")
+@RequiredArgsConstructor
 public class PaymentController {
 	
-	private PaymentService paymentService;
+	private final PaymentService paymentService;
 	
-	
-    @PostMapping("/create")
+    @PostMapping
+    @Operation(summary = "Create Payment", description = "Create a payment for the lunch")
     public ResponseEntity<PaymentModel> create(@RequestBody PaymentCreateDto paymentRequest) {
     	PaymentModel paymentModel = paymentService.processPayment(paymentRequest);
         return ResponseEntity.ok().body(paymentModel);
     }
 
     @PostMapping("/mercado-pago-webhook")
+    @Operation(summary = "Mercado Pago Webhook", description = "Mecado Pago webhook to update payment status")
     public ResponseEntity<PaymentModel> webhook(@RequestBody PaymentMercadoPago paymentRequest) {
     	String transactionID = paymentRequest.getData().getId();
     	PaymentModel paymentModel =  paymentService.checkPaymentStatus(transactionID, PaymentProviderEnum.MERCADO_PAGO);

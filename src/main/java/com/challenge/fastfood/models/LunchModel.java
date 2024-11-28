@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -23,7 +22,7 @@ public class LunchModel {
 	@Id
 	private Long id;
 
-	private String name;
+	private String cpf;
 
 	private String status;
 	
