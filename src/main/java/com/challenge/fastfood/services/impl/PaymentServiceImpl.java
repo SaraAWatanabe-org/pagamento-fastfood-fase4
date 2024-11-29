@@ -25,6 +25,7 @@ import com.challenge.fastfood.models.PaymentModel;
 import com.challenge.fastfood.repositories.LunchRepository;
 import com.challenge.fastfood.repositories.PaymentRepository;
 import com.challenge.fastfood.services.PaymentService;
+import java.math.RoundingMode;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -78,6 +79,8 @@ public class PaymentServiceImpl implements PaymentService {
 		if(paymentClient == null) {
 			throw new DataIntegrityException("Não foi selecionado um meio de pagamento válido.");
 		}
+
+		lunchModel.setValue(lunchModel.getValue().setScale(2, RoundingMode.HALF_UP));
 
 		PaymentModel paymentModel = paymentClient.createPayment(lunchModel);
 		paymentModel.setPaymentType(PaymentProviderEnum.MERCADO_PAGO);

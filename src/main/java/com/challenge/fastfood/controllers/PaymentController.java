@@ -24,12 +24,14 @@ import lombok.RequiredArgsConstructor;
 public class PaymentController {
 	
 	private final PaymentService paymentService;
-	
+
     @PostMapping
     @Operation(summary = "Create Payment", description = "Create a payment for the lunch")
-    public ResponseEntity<PaymentModel> create(@RequestBody @Valid PaymentCreateDto paymentRequest) {
-    	PaymentModel paymentModel = paymentService.processPayment(paymentRequest);
-        return ResponseEntity.ok().body(paymentModel);
+    public ResponseEntity<String> create(@RequestBody @Valid PaymentCreateDto paymentRequest) {
+        PaymentModel paymentModel = paymentService.processPayment(paymentRequest);
+        return ResponseEntity.ok()
+                .header("idTransaction", paymentModel.getTransactionId())
+                .body(paymentModel.getTransactionId());
     }
 
     @PostMapping("/mercado-pago-webhook")
