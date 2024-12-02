@@ -33,7 +33,7 @@ public class ResourceExceptionHandler {
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	ResponseEntity<StandardError> methodArgumentNotValid(MethodArgumentNotValidException e, HttpServletRequest request) {
+	public ResponseEntity<StandardError> methodArgumentNotValid(MethodArgumentNotValidException e, HttpServletRequest request) {
 		List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
 		String errors = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
 		StandardError err = new StandardError(HttpStatus.BAD_REQUEST.value(), errors, System.currentTimeMillis());
