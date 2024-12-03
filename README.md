@@ -81,7 +81,7 @@ Arquivos disponíveis para importação:
 É possível acessar o banco de dados via Adminer [clicando aqui](http://localhost:30000/).
 
 ## Vídeo
-É possível o vídeo com explicações sobre a arquitetura e infraestrutura [clicando aqui](https://youtu.be/mXX1s7UK7mU).
+É possível o vídeo com explicações sobre a arquitetura e infraestrutura [clicando aqui](https://youtu.be/Cl7rLaevhH4).
 
 ## Contatos
 - [Felipe Pereira](https://github.com/SaraAWatanabe)
